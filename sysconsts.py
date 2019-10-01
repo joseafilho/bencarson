@@ -1,0 +1,10 @@
+# Paths
+AC_PATH = "c:\\projetos\\ac"
+AC_SOURCE_PATH = AC_PATH + "\\Fontes"
+PESSOAL_SOURCE_PATH = AC_PATH + "\\FontesPS"
+FISCAL_SOURCE_PATH = AC_PATH + "\\FontesFC"
+CONTABIL_SOURCE_PATH = AC_PATH + "\\FontesCT"
+COMMON_SOURCE_PATH = AC_PATH + "\\FontesCommon"
+PESSOAL_DPR = "\\ACPS.dpr"
+FISCAL_DPR = "\\ACFC.dpr"
+CONTABIL_DPR = "\\ACCT.dpr"
