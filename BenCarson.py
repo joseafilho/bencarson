@@ -58,14 +58,41 @@ def copy_source_common_from_dpr(dirbase, dpr_base, dprs_compare):
                 line_splited = line.split(" ")
                 unit_name = line_splited[2]        
                 
-                if any(unit_name in s for s in dpr_compare_content):
-                    # *.pas
-                    unit_name = "%s.pas" % line_splited[2]    
-                    move_file(unit_name, dirbase, sysconsts.COMMON_SOURCE_PATH)
+                for unit_name_compare in dpr_compare_content:
+                    if unit_name in unit_name_compare:
+                        # *.pas
+                        unit_name = "%s.pas" % line_splited[2]    
+                        move_file(unit_name, dirbase, sysconsts.COMMON_SOURCE_PATH)
 
-                    # *.dfm            
-                    dfm_name = "%s.dfm" % line_splited[2]        
-                    move_file(dfm_name, dirbase, sysconsts.COMMON_SOURCE_PATH)                
+                        # *.dfm            
+                        dfm_name = "%s.dfm" % line_splited[2]        
+                        move_file(dfm_name, dirbase, sysconsts.COMMON_SOURCE_PATH)                
+
+                        break
+
+def extract_uses_from_pas(source):
+    unit = open(source, "r")
+    unit_content = unit.readlines()
+    unit_uses = []
+
+    for line in unit_content:
+        if line == "\n":
+            continue
+
+        ### Parei aqui. Não passar a variavel para false enquanto tiver no uses section
+        uses_start_section = "uses" in line
+
+        if uses_start_section:
+            line = line.strip()
+            unit_uses.append(line.split(","))                  
+
+def copy_source_from_pas():
+    for file_name in os.listdir(sysconsts.CONTABIL_SOURCE_PATH):        
+        if ".dfm" in file_name:
+            continue
+
+        extract_uses_from_pas(sysconsts.CONTABIL_SOURCE_PATH + "\\" + file_name)
+        break        
 
 def run():
     create_dir_sources()
@@ -80,4 +107,6 @@ def run():
 
     print("Success.")
 
-run()
+# Run application
+#run()
+copy_source_from_pas()
