@@ -104,13 +104,28 @@ def extract_uses_from_pas(source):
         
     return unit_uses
 
-def copy_source_from_pas():
-    for file_name in os.listdir(sysconsts.CONTABIL_SOURCE_PATH):        
+def copy_source_from_pas_uses(source_dir):
+    for file_name in os.listdir(source_dir):        
         if ".dfm" in file_name:
             continue
 
-        print(extract_uses_from_pas(sysconsts.CONTABIL_SOURCE_PATH + "\\" + file_name))
-        break        
+        uses = extract_uses_from_pas(source_dir + "\\" + file_name)
+        
+        for use in uses:
+            if not use:
+                continue
+
+            use = use.replace(",", "").replace(";", "").strip()            
+            use_path = "%s\\%s.pas" % (sysconsts.AC_SOURCE_PATH, use)
+
+            if os.path.isfile(use_path):
+                # *.pas
+                unit_name = "%s.pas" % use    
+                move_file(unit_name, sysconsts.AC_SOURCE_PATH, source_dir)
+
+                # *.dfm            
+                dfm_name = "%s.dfm" % use
+                move_file(dfm_name, sysconsts.AC_SOURCE_PATH, source_dir)                
 
 def run():
     create_dir_sources()
@@ -123,8 +138,9 @@ def run():
     copy_source_common_from_dpr(sysconsts.FISCAL_SOURCE_PATH, sysconsts.FISCAL_DPR, [sysconsts.CONTABIL_DPR, sysconsts.PESSOAL_DPR])
     copy_source_common_from_dpr(sysconsts.PESSOAL_SOURCE_PATH, sysconsts.PESSOAL_DPR, [sysconsts.CONTABIL_DPR, sysconsts.FISCAL_DPR])
 
+    copy_source_from_pas_uses(sysconsts.CONTABIL_SOURCE_PATH)
+
     print("Success.")
 
 # Run application
-#run()
-copy_source_from_pas()
+run()
