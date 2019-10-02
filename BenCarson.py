@@ -74,24 +74,42 @@ def extract_uses_from_pas(source):
     unit = open(source, "r")
     unit_content = unit.readlines()
     unit_uses = []
+    unit_sections = ["type", "var", "const", "implementation"] 
+    unit_word_reservated = ["function", "procedure", "{$R *.DFM}"]
+    uses_start_section = False    
+    is_sencond_section_uses = 0
 
     for line in unit_content:
         if line == "\n":
             continue
+        
+        if not uses_start_section:          
+            uses_start_section = "uses" in line           
 
-        ### Parei aqui. Não passar a variavel para false enquanto tiver no uses section
-        uses_start_section = "uses" in line
+            if uses_start_section:
+                is_sencond_section_uses += 1
+                
+        # Validando se já terminou as sessões uses.
+        if is_sencond_section_uses > 1:
+            if any(line.strip().startswith(s) for s in unit_word_reservated):
+                break                 
 
+        # Extraindo uses.
         if uses_start_section:
             line = line.strip()
-            unit_uses.append(line.split(","))                  
+            unit_uses += line.split(",")                    
+       
+        if any(line in section for section in unit_sections):
+            uses_start_section = False   
+        
+    return unit_uses
 
 def copy_source_from_pas():
     for file_name in os.listdir(sysconsts.CONTABIL_SOURCE_PATH):        
         if ".dfm" in file_name:
             continue
 
-        extract_uses_from_pas(sysconsts.CONTABIL_SOURCE_PATH + "\\" + file_name)
+        print(extract_uses_from_pas(sysconsts.CONTABIL_SOURCE_PATH + "\\" + file_name))
         break        
 
 def run():
